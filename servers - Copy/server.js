@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const authRoutes = require('./routes/authRoutes');
+const bodyParser = require('body-parser');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -13,14 +13,24 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json()); // Parse JSON bodies
+app.use(bodyParser.json()); // Parse other types of bodies
 
-// Routes
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+const communityRoutes = require('./routes/communityRoutes');
+const articleRoutes = require('./routes/articleRoutes');
+const commentRoutes = require('./routes/commentRoutes');
+
+// API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/communities', communityRoutes);
+app.use('/api/articles', articleRoutes);
+app.use('/api/comments', commentRoutes);
 
 // Connect to MongoDB
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI, {
+        const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/community_db', {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
